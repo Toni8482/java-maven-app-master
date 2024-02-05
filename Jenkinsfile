@@ -2,37 +2,33 @@ def gv
 
 pipeline {
     agent any
+    parameters{
+        choice(name: 'VERSION', choices:['1.1.0''1.2.0','1.3.0'], description: '')
+        booleanParam(name: 'executeTest', defaultValue:treu, description: '')
+    }
     stages {
-        stage("init") {
+        stage('Build') {
             steps {
-                script {
-                    gv = load "script.groovy"
-                }
+                echo 'Building..'
+                sh "mvn --version"
             }
         }
-        stage("build jar") {
-            steps {
-                script {
-                    echo "building jar"
-                    //gv.buildJar()
+        stage('Test') {
+            when{
+                expression{
+                    params.execureTest
                 }
             }
-        }
-        stage("build image") {
             steps {
-                script {
-                    echo "building image"
-                    //gv.buildImage()
-                }
+                echo 'Testing..'
             }
         }
-        stage("deploy") {
+        stage('Deploy') {
             steps {
-                script {
-                    echo "deploying"
-                    //gv.deployApp()
-                }
+                echo 'Deploying....'
+                echo "deploying version ${params.VERSION}"
             }
         }
-    }   
+    }
+   
 }
